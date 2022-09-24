@@ -10,7 +10,7 @@ namespace Proj_ONG_ResGatinhos
             //Conexão para o Banco de Dados:
             Banco_De_Dados conn = new Banco_De_Dados();
             SqlConnection conexaoSql = new SqlConnection(conn.Caminho());
-            conexaoSql.Open();
+            conexaoSql.Open(); 
 
 
 
