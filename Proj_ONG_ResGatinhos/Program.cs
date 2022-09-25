@@ -106,7 +106,7 @@ namespace Proj_ONG_ResGatinhos
                             Console.WriteLine("ADOTANTES\n");
                             Console.Write("\nInforme o 'CPF' do Adotante para ver quais Animais ele adotou: ");
                             string cpf = Console.ReadLine();
-                            MostrarAnimaisAdotados(cpf, connection);
+                            MostrarAnimaisAdotadosPeloCPF(cpf, connection);
                             break;
                     }
                 }
@@ -118,7 +118,50 @@ namespace Proj_ONG_ResGatinhos
         }
         public static void Tela_Pets(SqlConnection connection) // OnProgress...
         {
+            connection.Open();
+            do
+            {
+                int opc;
+                Console.Clear();
+                Console.WriteLine("PETS\n");
+                Console.WriteLine(" O que deseja fazer?");
+                Console.WriteLine(" 1 - Cadastrar um novo PET");
+                Console.WriteLine(" 2 - Editar os dados de um já cadastrado");
+                Console.WriteLine(" 3 - Ver a Lista de Pets Disponíveis para Adoção");
+                Console.WriteLine(" 4 - Ver a Lista de Pets já Adotados");
+                Console.WriteLine(" 0 - Voltar");
+                try
+                {
+                    opc = int.Parse(Console.ReadLine());
+                    switch (opc)
+                    {
+                        case 0:
+                            connection.Close(); // OK
+                            Tela_Inicial(connection);
+                            break;
 
+                        case 1:
+                            connection.Close();// OnProgress...
+                            break;
+
+                        case 2:
+                            connection.Close(); // OnProgress...
+                            break;
+
+                        case 3:
+                            connection.Close(); // OnProgress...
+                            break;
+
+                        case 4:
+                            connection.Close(); // OnProgress...
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            } while (true);
         }
         public static void Tela_Adocao(SqlConnection connection) // OnProgress...
         {
@@ -268,7 +311,7 @@ namespace Proj_ONG_ResGatinhos
             cmd.ExecuteNonQuery();
             connection.Close();
         }
-        static void MostrarAnimaisAdotados(String cpf, SqlConnection connection) // OK
+        static void MostrarAnimaisAdotadosPeloCPF(String cpf, SqlConnection connection) // OK
         {
             SqlCommand cmd = new SqlCommand();
             try
