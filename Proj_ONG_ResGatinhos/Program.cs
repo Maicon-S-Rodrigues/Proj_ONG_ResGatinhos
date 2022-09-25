@@ -35,19 +35,16 @@ namespace Proj_ONG_ResGatinhos
                         case 1:
                             connection.Close();
                             Tela_Adotantes(connection);
-
                             break;
 
                         case 2:
                             connection.Close();
                             Tela_Pets(connection);
-
                             break;
 
                         case 3:
                             connection.Close();
                             Tela_Adocao(connection);
-
                             break;
 
                         default:
@@ -116,7 +113,7 @@ namespace Proj_ONG_ResGatinhos
                 }
             } while (true);
         }
-        public static void Tela_Pets(SqlConnection connection) // OnProgress...
+        public static void Tela_Pets(SqlConnection connection) // OnProgress... (-faltando os updates-)
         {
             connection.Open();
             do
@@ -141,7 +138,7 @@ namespace Proj_ONG_ResGatinhos
                             break;
 
                         case 1:
-                            connection.Close();// OnProgress...
+                            connection.Close();// OK
                             CadastrarNovoPet(connection);
                             break;
 
@@ -150,12 +147,12 @@ namespace Proj_ONG_ResGatinhos
                             break;
 
                         case 3:
-                            connection.Close(); // OnProgress...
+                            connection.Close(); // OK
                             MostrarPetsDisponiveis(connection);  
                             break;
 
                         case 4:
-                            connection.Close(); // OnProgress...
+                            connection.Close(); // OK
                             MostrarPetsAdotados(connection);
                             break;
                     }
@@ -437,13 +434,69 @@ namespace Proj_ONG_ResGatinhos
             cmd.ExecuteNonQuery();
             connection.Close();
         }
-        static void MostrarPetsDisponiveis(SqlConnection connection) // OnProgress
+        static void MostrarPetsDisponiveis(SqlConnection connection) // OK
         {
+            SqlCommand cmd = new SqlCommand();
 
+            cmd.CommandText = "SELECT CHIP, Familia, Raca, Nome, Sexo, Situacao FROM Animal WHERE Situacao = 'DISPONIVEL';";
+            cmd.Connection = connection;
+            connection.Open();
+
+            using (SqlDataReader reader = cmd.ExecuteReader())
+            {
+                Console.Clear();
+                Console.WriteLine("\nLista de PETS Disponíveis para Adoção:");
+                Console.WriteLine("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________");
+                Console.WriteLine("|  CHIP  |  Família  |  Raca  |  Nome  |  Sexo  |  Situação  |");
+                Console.WriteLine("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________\n\n");
+                while (reader.Read())
+                {
+                    Console.WriteLine("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________");
+                    Console.Write("{0}", /*chip*/reader.GetInt32(0) +  "    |    " +
+                                      /*familia*/reader.GetString(1) + "    |    " +
+                                         /*raca*/reader.GetString(2) + "    |    " +
+                                         /*nome*/reader.GetString(3) + "    |    " +
+                                         /*sexo*/reader.GetString(4) + "    |    " +
+                                     /*situacao*/reader.GetString(5) + "    |    \n");
+                    Console.Write("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________\n\n");
+                }
+                Console.WriteLine("Fim da Lista");
+                Pausa();
+                connection.Close();
+                Tela_Pets(connection);
+            }
         }
-        static void MostrarPetsAdotados(SqlConnection connection) // OnProgress
+        static void MostrarPetsAdotados(SqlConnection connection) // OK
         {
+            SqlCommand cmd = new SqlCommand();
 
+            cmd.CommandText = "SELECT CHIP, Familia, Raca, Nome, Sexo, Situacao FROM Animal WHERE Situacao = 'ADOTADO';";
+            cmd.Connection = connection;
+            connection.Open();
+
+            using (SqlDataReader reader = cmd.ExecuteReader())
+            {
+                Console.Clear();
+                Console.WriteLine("\nLista de PETS já Adotados:");
+                Console.WriteLine("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________");
+                Console.WriteLine("|  CHIP  |  Família  |  Raca  |  Nome  |  Sexo  |  Situação  |");
+                Console.WriteLine("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________\n\n");
+                while (reader.Read())
+                {
+                    Console.WriteLine("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________");
+                    Console.Write("{0}", /*chip*/reader.GetInt32(0)  + "    |    " +
+                                      /*familia*/reader.GetString(1) + "    |    " +
+                                         /*raca*/reader.GetString(2) + "    |    " +
+                                         /*nome*/reader.GetString(3) + "    |    " +
+                                         /*sexo*/reader.GetString(4) + "    |    " +
+                                     /*situacao*/reader.GetString(5) + "    |    \n");
+                    Console.Write("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________\n\n");
+                }
+                Console.WriteLine("Fim da Lista");
+                Pausa();
+                connection.Close();
+                Tela_Pets(connection);
+            }
         }
         #endregion
 
