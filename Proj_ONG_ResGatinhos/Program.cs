@@ -61,7 +61,7 @@ namespace Proj_ONG_ResGatinhos
                 }
             } while (true);
         }
-        public static void Tela_Adotantes(SqlConnection connection) // OnProgress
+        public static void Tela_Adotantes(SqlConnection connection) // OnProgress... (-faltando os updates-)
         {
             connection.Open();
             do
@@ -81,28 +81,32 @@ namespace Proj_ONG_ResGatinhos
                     switch (opc)
                     {
                         case 0:
-                            connection.Close();
+                            connection.Close(); // OK
                             Tela_Inicial(connection);
                             break;
 
                         case 1:
-                            connection.Close();
+                            connection.Close();// OK
                             MostrarAdotantesCadastrados(connection);
                             break;
 
                         case 2:
-                            connection.Close();
+                            connection.Close(); // OK
                             CadastrarNovoAdotante(connection);
                             break;
 
                         case 3:
-                            connection.Close();
+                            connection.Close(); // OnProgress...
 
                             break;
 
                         case 4:
-                            connection.Close();
-
+                            connection.Close(); // OK...
+                            Console.Clear();
+                            Console.WriteLine("ADOTANTES\n");
+                            Console.Write("\nInforme o 'CPF' do Adotante para ver quais Animais ele adotou: ");
+                            string cpf = Console.ReadLine();
+                            MostrarAnimaisAdotados(cpf, connection);
                             break;
                     }
                 }
@@ -112,11 +116,11 @@ namespace Proj_ONG_ResGatinhos
                 }
             } while (true);
         }
-        public static void Tela_Pets(SqlConnection connection) // OnProgress
+        public static void Tela_Pets(SqlConnection connection) // OnProgress...
         {
 
         }
-        public static void Tela_Adocao(SqlConnection connection) // OnProgress
+        public static void Tela_Adocao(SqlConnection connection) // OnProgress...
         {
 
         }
@@ -180,7 +184,7 @@ namespace Proj_ONG_ResGatinhos
             SqlParameter SQLrua = new SqlParameter("@Rua", System.Data.SqlDbType.VarChar, 50);
             SqlParameter SQLnumero = new SqlParameter("@Numero", System.Data.SqlDbType.Int);
             SqlParameter SQLcomplemento = new SqlParameter("@Complemento", System.Data.SqlDbType.VarChar, 50);
-//___________________________________________________________________________________________________________________________________________________________
+            //___________________________________________________________________________________________________________________________________________________________
             //variaveis locais
             string cpf, nome, sexo, telefone, cidade, estado, bairro, rua, complemento;
             DateTime dataNasc;
@@ -263,6 +267,67 @@ namespace Proj_ONG_ResGatinhos
             cmd.Prepare();
             cmd.ExecuteNonQuery();
             connection.Close();
+        }
+        static void MostrarAnimaisAdotados(String cpf, SqlConnection connection) // OK
+        {
+            SqlCommand cmd = new SqlCommand();
+            try
+            {
+                cmd.CommandText = "SELECT Pessoa.CPF, Pessoa.Nome, Animal.Familia, Animal.Nome, Animal.Raca, Animal.Situacao " +
+                  "FROM Adota " +
+
+                  "RIGHT JOIN Pessoa " +
+
+                  "ON(Pessoa.CPF = Adota.CPF) " +
+
+                  "RIGHT JOIN Animal " +
+
+                  "ON(Animal.CHIP = Adota.CHIP) " +
+
+                  "WHERE Pessoa.CPF = @CPF; ";
+
+                cmd.Connection = connection;
+                connection.Open();
+
+                SqlParameter SQLcpf = new SqlParameter("@CPF", System.Data.SqlDbType.VarChar, 11);
+                SQLcpf.Value = cpf;
+
+                cmd.Parameters.Add(SQLcpf);
+
+                cmd.Prepare();
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    Console.Clear();
+                    Console.WriteLine("\nLista de Animais Adotados pelo adotante com o 'CPF': " + cpf);
+                    Console.WriteLine("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________");
+                    Console.WriteLine("|  CPF  |   Nome   |   Animal   |    Nome do Pet   |   Raça  |   Status     |");
+                    Console.WriteLine("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________\n\n");
+                    while (reader.Read())
+                    {
+                        Console.WriteLine("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________");
+                        Console.Write("{0}",  /*cpf*/reader.GetString(0) + "    |    " +
+                                             /*nome*/reader.GetString(1) + "    |    " +
+                                           /*animal*/reader.GetString(2) + "    |    " +
+                                      /*nome do pet*/reader.GetString(3) + "    |    " +
+                                             /*raça*/reader.GetString(4) + "    |    " +
+                                           /*Status*/reader.GetString(5) + "    |    \n");
+                        Console.Write("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________\n\n");
+                    }
+                    Console.WriteLine("Fim da Lista");
+                    Pausa();
+                    connection.Close();
+                    Tela_Adotantes(connection);
+                }
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("\n\nNão foi possível realizar essa busca, tente novamente.\n" +
+                                  "Certifique-se de que o 'CPF' informado para busca foi digitado corretamente");
+                Pausa();
+                connection.Close();
+                Tela_Adotantes(connection);
+            }
         }
         static void Pausa() // OK
         {
