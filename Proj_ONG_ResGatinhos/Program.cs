@@ -142,6 +142,7 @@ namespace Proj_ONG_ResGatinhos
 
                         case 1:
                             connection.Close();// OnProgress...
+                            CadastrarNovoPet(connection);
                             break;
 
                         case 2:
@@ -150,10 +151,12 @@ namespace Proj_ONG_ResGatinhos
 
                         case 3:
                             connection.Close(); // OnProgress...
+                            MostrarPetsDisponiveis(connection);  
                             break;
 
                         case 4:
                             connection.Close(); // OnProgress...
+                            MostrarPetsAdotados(connection);
                             break;
                     }
                 }
@@ -168,7 +171,7 @@ namespace Proj_ONG_ResGatinhos
 
         }
         #endregion
-        #region FUNCTIONS
+        #region FUNCTIONS - ADOTANTES
         static void MostrarAdotantesCadastrados(SqlConnection connection) // OK
         {
             SqlCommand cmd = new SqlCommand();
@@ -234,10 +237,10 @@ namespace Proj_ONG_ResGatinhos
             int numero;
 
             Console.WriteLine("CADASTRO DE ADOTANTE\n\n");
-            Console.Write("Informe o CPF para começar: ");
+            Console.Write("\nInforme o CPF para começar: ");
             cpf = Console.ReadLine();
 
-            Console.Write("Nome: ");
+            Console.Write("\nNome: ");
             nome = Console.ReadLine();
 
 
@@ -246,7 +249,7 @@ namespace Proj_ONG_ResGatinhos
             {
                 Console.Write("\nDigite [- F -] para Feminino, [- M -] para Masculino ou [- N -] caso Não queira informar");
                 Console.Write("\nSexo: ");
-                sexo = Console.ReadLine();
+                sexo = Console.ReadLine().ToUpper();
                 if (sexo.ToUpper() == "F" || sexo.ToUpper() == "M" || sexo.ToUpper() == "N")
                 {
                     flag = true;
@@ -372,6 +375,79 @@ namespace Proj_ONG_ResGatinhos
                 Tela_Adotantes(connection);
             }
         }
+        #endregion
+
+        #region FUNCTIONS - PETS
+        static void CadastrarNovoPet(SqlConnection connection) // OK
+        {
+            Console.Clear();
+            SqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "INSERT INTO Animal (Familia, Raca, Nome, Sexo) " +
+                              "VALUES(@Familia, @Raca, @Nome, @Sexo);";
+            cmd.Connection = connection;
+            connection.Open();
+
+            SqlParameter SQLfamilia = new SqlParameter("@Familia", System.Data.SqlDbType.VarChar, 35);
+            SqlParameter SQLraca = new SqlParameter("@Raca", System.Data.SqlDbType.VarChar, 50);
+            SqlParameter SQLnome = new SqlParameter("@Nome", System.Data.SqlDbType.VarChar, 50);
+            SqlParameter SQLsexo = new SqlParameter("@Sexo", System.Data.SqlDbType.Char, 1);
+
+            string familia, raca, nome, sexo;
+
+            Console.WriteLine("CADASTRO DE PET\n\n");
+
+            Console.Write("Informe qual Família Animal ele ou ela pertence para começar (Ex: Cachorro, Gato, Passaro, etc)");
+            Console.Write("\nFamília Animal: ");
+            familia = Console.ReadLine();
+
+            Console.Write("\n(Obs: pode deixar em branco e editar depois caso não seja identificado a princípio)");
+            Console.Write("\nRaça: ");
+            raca = Console.ReadLine();
+
+            Console.Write("\nNome: ");
+            nome = Console.ReadLine();
+
+            bool flag = false;
+            do
+            {
+                Console.Write("\nDigite [- F -] para Feminino, [- M -] para Masculino ou [- N -] caso Não queira ou não saiba informar neste momento");
+                Console.Write("\nSexo: ");
+                sexo = Console.ReadLine().ToUpper();
+                if (sexo.ToUpper() == "F" || sexo.ToUpper() == "M" || sexo.ToUpper() == "N")
+                {
+                    flag = true;
+                    break;
+                }
+            } while (flag == false);
+
+
+            Animal A = new Animal(familia, raca, nome, sexo);
+
+            SQLfamilia.Value = A.Familia;
+            SQLraca.Value = A.Raca;
+            SQLnome.Value = A.Nome;
+            SQLsexo.Value = A.Sexo;
+
+            cmd.Parameters.Add(SQLfamilia);
+            cmd.Parameters.Add(SQLraca);
+            cmd.Parameters.Add(SQLnome);
+            cmd.Parameters.Add(SQLsexo);
+
+            cmd.Prepare();
+            cmd.ExecuteNonQuery();
+            connection.Close();
+        }
+        static void MostrarPetsDisponiveis(SqlConnection connection) // OnProgress
+        {
+
+        }
+        static void MostrarPetsAdotados(SqlConnection connection) // OnProgress
+        {
+
+        }
+        #endregion
+
+        #region FUNCTIONS - GERAL
         static void Pausa() // OK
         {
             Console.WriteLine("Aperte [- ENTER -] para continuar...");
