@@ -58,7 +58,7 @@ namespace Proj_ONG_ResGatinhos
                 }
             } while (true);
         }
-        public static void Tela_Adotantes(SqlConnection connection) // OnProgress... (-faltando os updates-)
+        public static void Tela_Adotantes(SqlConnection connection) // OK
         {
             connection.Open();
             do
@@ -93,7 +93,7 @@ namespace Proj_ONG_ResGatinhos
                             break;
 
                         case 3:
-                            connection.Close(); // OnProgress...
+                            connection.Close(); // OK
                             Console.Clear();
                             Console.WriteLine("\nEDITAR ADOTANTES\n");
                             Console.Write("\nInforme o 'CPF' do Adotante que deseja editar: ");
@@ -117,7 +117,7 @@ namespace Proj_ONG_ResGatinhos
                 }
             } while (true);
         }
-        public static void Tela_Pets(SqlConnection connection) // OnProgress... (-faltando os updates-)
+        public static void Tela_Pets(SqlConnection connection) // OK
         {
             connection.Open();
             do
@@ -147,7 +147,12 @@ namespace Proj_ONG_ResGatinhos
                             break;
 
                         case 2:
-                            connection.Close(); // OnProgress...
+                            connection.Close(); // OK
+                            Console.Clear();
+                            Console.WriteLine("\nEDITAR PETS\n");
+                            Console.Write("\nInforme o número do 'CHIP' do Pet que deseja editar: ");
+                            string chip = Console.ReadLine();
+                            EditarPET(chip, connection);
                             break;
 
                         case 3:
@@ -431,7 +436,7 @@ namespace Proj_ONG_ResGatinhos
             {
                 int opc;
                 Console.Clear();
-                Console.WriteLine("EDITAR ADOTANTES\n");
+                Console.WriteLine("EDITAR ADOTANTE  -  CPF: " + cpfEditar);
                 Console.WriteLine(" O que deseja fazer?");
                 Console.WriteLine(" 1 - Editar Nome");
                 Console.WriteLine(" 2 - Editar Telefone");
@@ -865,6 +870,236 @@ namespace Proj_ONG_ResGatinhos
                 Tela_Pets(connection);
             }
         }
+        #region EDITAR - PETS
+        static void EditarPET(string chip, SqlConnection connection)
+        {
+            connection.Open();
+            do
+            {
+                int opc;
+                Console.Clear();
+                Console.WriteLine("EDITAR PET - CHIP Nº: " + chip);
+                Console.WriteLine(" O que deseja fazer?");
+                Console.WriteLine(" 1 - Editar Família Animal");
+                Console.WriteLine(" 2 - Editar Raça");
+                Console.WriteLine(" 3 - Editar Sexo");
+                Console.WriteLine(" 4 - Editar Nome");
+                Console.WriteLine(" 0 - Voltar");
+                try
+                {
+                    opc = int.Parse(Console.ReadLine());
+                    switch (opc)
+                    {
+                        case 0:
+                            connection.Close(); // OK
+                            Tela_Pets(connection);
+                            break;
+
+                        case 1:
+                            connection.Close(); // OK
+                            EditarFamiliaPET(chip, connection);
+                            break;
+
+                        case 2:
+                            connection.Close(); // OK
+                            EditarRacaPET(chip, connection);
+                            break;
+
+                        case 3:
+                            connection.Close(); // OK
+                            EditarSexoPET(chip, connection);
+                            break;
+
+                        case 4:
+                            connection.Close(); // OK
+                            EditarNomePET(chip, connection);
+                            break;
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine("Escolha um valor numérico que represente a opção desejada!\n");
+                    Pausa();
+                }
+            } while (true);
+        }
+        static void EditarFamiliaPET (string chip, SqlConnection connection)
+        {
+            Console.Clear();
+            SqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "UPDATE Animal SET Familia = @Familia WHERE CHIP = @CHIP;";
+            cmd.Connection = connection;
+            connection.Open();
+
+            SqlParameter SQLfamilia = new SqlParameter("@Familia", System.Data.SqlDbType.VarChar, 35);
+            SqlParameter SQLchip = new SqlParameter("@CHIP", System.Data.SqlDbType.Int);
+
+            Console.WriteLine("ALTERAR FAMILIA ANIMAL\n\n");
+
+            Console.Write("Informe a Nova Familia Animal a ser inserida no registro: ");
+            string familia = Console.ReadLine();
+
+            SQLfamilia.Value = familia;
+            SQLchip.Value = chip;
+
+            cmd.Parameters.Add(SQLfamilia);
+            cmd.Parameters.Add(SQLchip);
+
+            cmd.Prepare();
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+                Console.Clear();
+                Console.WriteLine("\nNome da Família Animal Alterada com Sucesso!!!");
+                Pausa();
+                connection.Close();
+                EditarPET(chip, connection);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Desculpe, Houve um erro inesperado...\n\nDescrição do Erro: <<<( " + ex + " )>>>");
+                Pausa();
+                connection.Close();
+                EditarPET(chip, connection);
+            }
+        } // OK
+        static void EditarRacaPET(string chip, SqlConnection connection)
+        {
+            Console.Clear();
+            SqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "UPDATE Animal SET Raca = @Raca WHERE CHIP = @CHIP;";
+            cmd.Connection = connection;
+            connection.Open();
+
+            SqlParameter SQLraca = new SqlParameter("@Raca", System.Data.SqlDbType.VarChar, 50);
+            SqlParameter SQLchip = new SqlParameter("@CHIP", System.Data.SqlDbType.Int);
+
+            Console.WriteLine("ALTERAR RAÇA\n\n");
+
+            Console.Write("Informe a Raça a ser inserida no registro: ");
+            string raca = Console.ReadLine();
+
+            SQLraca.Value = raca;
+            SQLchip.Value = chip;
+
+            cmd.Parameters.Add(SQLraca);
+            cmd.Parameters.Add(SQLchip);
+
+            cmd.Prepare();
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+                Console.Clear();
+                Console.WriteLine("\nRaça Alterada com Sucesso!!!");
+                Pausa();
+                connection.Close();
+                EditarPET(chip, connection);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Desculpe, Houve um erro inesperado...\n\nDescrição do Erro: <<<( " + ex + " )>>>");
+                Pausa();
+                connection.Close();
+                EditarPET(chip, connection);
+            }
+        } // OK
+        static void EditarSexoPET(string chip, SqlConnection connection)
+        {
+            Console.Clear();
+            SqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "UPDATE Animal SET Sexo = @Sexo WHERE CHIP = @CHIP;";
+            cmd.Connection = connection;
+            connection.Open();
+
+            SqlParameter SQLsexo = new SqlParameter("@Sexo", System.Data.SqlDbType.Char, 1);
+            SqlParameter SQLchip = new SqlParameter("@CHIP", System.Data.SqlDbType.Int);
+
+            Console.WriteLine("ALTERAR SEXO\n\n");
+
+            Console.Write("Informe o Novo Sexo a ser inserido: ");
+            bool flag = false;
+            string sexo;
+            do
+            {
+                Console.Write("\nDigite [- F -] para Feminino, [- M -] para Masculino ou [- N -] caso Não queira informar");
+                Console.Write("\nSexo: ");
+                sexo = Console.ReadLine().ToUpper();
+                if (sexo.ToUpper() == "F" || sexo.ToUpper() == "M" || sexo.ToUpper() == "N")
+                {
+                    flag = true;
+                    break;
+                }
+            } while (flag == false);
+
+            SQLsexo.Value = sexo;
+            SQLchip.Value = chip;
+
+            cmd.Parameters.Add(SQLsexo);
+            cmd.Parameters.Add(SQLchip);
+
+            cmd.Prepare();
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+                Console.Clear();
+                Console.WriteLine("\nSexo Alterado com Sucesso!!!");
+                Pausa();
+                connection.Close();
+                EditarPET(chip, connection);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Desculpe, Houve um erro inesperado...\n\nDescrição do Erro: <<<( " + ex + " )>>>");
+                Pausa();
+                connection.Close();
+                EditarPET(chip, connection);
+            }
+        } // OK
+        static void EditarNomePET(string chip, SqlConnection connection)
+        {
+            Console.Clear();
+            SqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "UPDATE Animal SET Nome = @Nome WHERE CHIP = @CHIP;";
+            cmd.Connection = connection;
+            connection.Open();
+
+            SqlParameter SQLnome = new SqlParameter("@Nome", System.Data.SqlDbType.VarChar, 50);
+            SqlParameter SQLchip = new SqlParameter("@CHIP", System.Data.SqlDbType.Int);
+
+            Console.WriteLine("ALTERAR NOME\n\n");
+
+            Console.Write("Informe o Novo Nome a ser inserido: ");
+            string nome = Console.ReadLine();
+
+            SQLnome.Value = nome;
+            SQLchip.Value = chip;
+
+            cmd.Parameters.Add(SQLnome);
+            cmd.Parameters.Add(SQLchip);
+
+            cmd.Prepare();
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+                Console.Clear();
+                Console.WriteLine("\nNome Alterado com Sucesso!!!");
+                Pausa();
+                connection.Close();
+                EditarPET(chip, connection);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Desculpe, Houve um erro inesperado...\n\nDescrição do Erro: <<<( " + ex + " )>>>");
+                Pausa();
+                connection.Close();
+                EditarPET(chip, connection);
+            }
+        } // OK
+        #endregion
         #endregion
 
         #region FUNCTIONS - ADOCAO
