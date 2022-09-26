@@ -94,7 +94,11 @@ namespace Proj_ONG_ResGatinhos
 
                         case 3:
                             connection.Close(); // OnProgress...
-
+                            Console.Clear();
+                            Console.WriteLine("\nEDITAR ADOTANTES\n");
+                            Console.Write("\nInforme o 'CPF' do Adotante que deseja editar: ");
+                            string cpfEditar = Console.ReadLine();
+                            EditarAdotante(cpfEditar, connection);
                             break;
 
                         case 4:
@@ -102,8 +106,8 @@ namespace Proj_ONG_ResGatinhos
                             Console.Clear();
                             Console.WriteLine("ADOTANTES\n");
                             Console.Write("\nInforme o 'CPF' do Adotante para ver quais Animais ele adotou: ");
-                            string cpf = Console.ReadLine();
-                            MostrarAnimaisAdotadosPeloCPF(cpf, connection);
+                            string cpfPesquisa = Console.ReadLine();
+                            MostrarAnimaisAdotadosPeloCPF(cpfPesquisa, connection);
                             break;
                     }
                 }
@@ -148,7 +152,7 @@ namespace Proj_ONG_ResGatinhos
 
                         case 3:
                             connection.Close(); // OK
-                            MostrarPetsDisponiveis(connection);  
+                            MostrarPetsDisponiveis(connection);
                             break;
 
                         case 4:
@@ -157,13 +161,14 @@ namespace Proj_ONG_ResGatinhos
                             break;
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Console.WriteLine(ex);
+                    Console.WriteLine("Escolha um valor numérico que represente a opção desejada!\n");
+                    Pausa();
                 }
             } while (true);
         }
-        public static void Tela_Adocao(SqlConnection connection) // OnProgress...
+        public static void Tela_Adocao(SqlConnection connection) // OK
         {
             connection.Open();
             do
@@ -192,19 +197,20 @@ namespace Proj_ONG_ResGatinhos
                             break;
 
                         case 2:
-                            connection.Close(); // OnProgress...
+                            connection.Close(); // OK
                             DesfazerUmaAdocao(connection);
                             break;
 
                         case 3:
-                            connection.Close(); // OonProgress...
+                            connection.Close(); // OK
                             MostrarAdotantesESeusPets(connection);
                             break;
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Console.WriteLine(ex);
+                    Console.WriteLine("Escolha um valor numérico que represente a opção desejada!\n");
+                    Pausa();
                 }
             } while (true);
         }
@@ -264,8 +270,8 @@ namespace Proj_ONG_ResGatinhos
             SqlParameter SQLdataNasc = new SqlParameter("@Data_Nascimento", System.Data.SqlDbType.Date);
             SqlParameter SQLtelefone = new SqlParameter("@Telefone", System.Data.SqlDbType.VarChar, 12);
             SqlParameter SQLcidade = new SqlParameter("@Cidade", System.Data.SqlDbType.VarChar, 50);
-            SqlParameter SQLestado = new SqlParameter("@Estado", System.Data.SqlDbType.Char, 2);
-            SqlParameter SQLbairro = new SqlParameter("@bairro", System.Data.SqlDbType.VarChar, 50);
+            SqlParameter SQLestado = new SqlParameter("@Estado", System.Data.SqlDbType.VarChar, 30);
+            SqlParameter SQLbairro = new SqlParameter("@Bairro", System.Data.SqlDbType.VarChar, 50);
             SqlParameter SQLrua = new SqlParameter("@Rua", System.Data.SqlDbType.VarChar, 50);
             SqlParameter SQLnumero = new SqlParameter("@Numero", System.Data.SqlDbType.Int);
             SqlParameter SQLcomplemento = new SqlParameter("@Complemento", System.Data.SqlDbType.VarChar, 50);
@@ -356,7 +362,7 @@ namespace Proj_ONG_ResGatinhos
             Pausa();
             connection.Close();
         }
-        static void MostrarAnimaisAdotadosPeloCPF(String cpf, SqlConnection connection) // OK
+        static void MostrarAnimaisAdotadosPeloCPF(string cpfPesquisa, SqlConnection connection) // OK
         {
             SqlCommand cmd = new SqlCommand();
             try
@@ -378,7 +384,7 @@ namespace Proj_ONG_ResGatinhos
                 connection.Open();
 
                 SqlParameter SQLcpf = new SqlParameter("@CPF", System.Data.SqlDbType.VarChar, 11);
-                SQLcpf.Value = cpf;
+                SQLcpf.Value = cpfPesquisa;
 
                 cmd.Parameters.Add(SQLcpf);
 
@@ -387,7 +393,7 @@ namespace Proj_ONG_ResGatinhos
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {
                     Console.Clear();
-                    Console.WriteLine("\nLista de Animais Adotados pelo adotante com o 'CPF': " + cpf);
+                    Console.WriteLine("\nLista de Animais Adotados pelo adotante com o 'CPF': " + cpfPesquisa);
                     Console.WriteLine("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________");
                     Console.WriteLine("|  CPF  |   Nome   |   Animal   |    Nome do Pet   |   Raça  |   Status     |");
                     Console.WriteLine("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________\n\n");
@@ -417,6 +423,319 @@ namespace Proj_ONG_ResGatinhos
                 Tela_Adotantes(connection);
             }
         }
+        #region EDITAR - ADOTANTES
+        static void EditarAdotante(string cpfEditar, SqlConnection connection) // OK
+        {
+            connection.Open();
+            do
+            {
+                int opc;
+                Console.Clear();
+                Console.WriteLine("EDITAR ADOTANTES\n");
+                Console.WriteLine(" O que deseja fazer?");
+                Console.WriteLine(" 1 - Editar Nome");
+                Console.WriteLine(" 2 - Editar Telefone");
+                Console.WriteLine(" 3 - Editar Sexo");
+                Console.WriteLine(" 4 - Editar Endereço");
+                Console.WriteLine(" 5 - Editar Data de Nascimento");
+                Console.WriteLine(" 0 - Voltar");
+                try
+                {
+                    opc = int.Parse(Console.ReadLine());
+                    switch (opc)
+                    {
+                        case 0:
+                            connection.Close(); // OK
+                            Tela_Adotantes(connection);
+                            break;
+
+                        case 1:
+                            connection.Close();// OK
+                            EditarNomeAdotante(cpfEditar, connection);
+                            break;
+
+                        case 2:
+                            connection.Close(); // OK
+                            EditarTelefoneAdotante(cpfEditar, connection);
+                            break;
+
+                        case 3:
+                            connection.Close(); // OK
+                            EditarSexoAdotante(cpfEditar, connection);
+                            break;
+
+                        case 4:
+                            connection.Close(); // OK
+                            EditarEnderecoAdotante(cpfEditar, connection);
+                            break;
+
+                        case 5:
+                            connection.Close(); // OK
+                            EditarDataNascimentoAdotante(cpfEditar, connection);
+                            break;
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine("Escolha um valor numérico que represente a opção desejada!\n");
+                    Pausa();
+                }
+            } while (true);
+        }
+        static void EditarNomeAdotante(string cpfEditar, SqlConnection connection)
+        {
+            Console.Clear();
+            SqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "UPDATE Pessoa SET Nome = @Nome WHERE CPF = @CPF;";
+            cmd.Connection = connection;
+            connection.Open();
+
+            SqlParameter SQLnome = new SqlParameter("@Nome", System.Data.SqlDbType.VarChar, 50);
+            SqlParameter SQLcpf = new SqlParameter("@CPF", System.Data.SqlDbType.VarChar, 11);
+
+            Console.WriteLine("ALTERAR NOME\n\n");
+
+            Console.Write("Informe o Novo Nome a ser inserido: ");
+            string nome = Console.ReadLine();
+
+            SQLnome.Value = nome;
+            SQLcpf.Value = cpfEditar;
+
+            cmd.Parameters.Add(SQLnome);
+            cmd.Parameters.Add(SQLcpf);
+
+            cmd.Prepare();
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+                Console.Clear();
+                Console.WriteLine("\nNome Alterado com Sucesso!!!");
+                Pausa();
+                connection.Close();
+                EditarAdotante(cpfEditar, connection);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Desculpe, Houve um erro inesperado...\n\nDescrição do Erro: <<<( " + ex + " )>>>");
+                Pausa();
+                connection.Close();
+                EditarAdotante(cpfEditar, connection);
+            }
+        } // OK
+        static void EditarTelefoneAdotante(string cpfEditar, SqlConnection connection)
+        {
+            Console.Clear();
+            SqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "UPDATE Pessoa SET Telefone = @Telefone WHERE CPF = @CPF;";
+            cmd.Connection = connection;
+            connection.Open();
+
+            SqlParameter SQLtelefone = new SqlParameter("@Telefone", System.Data.SqlDbType.VarChar, 12);
+            SqlParameter SQLcpf = new SqlParameter("@CPF", System.Data.SqlDbType.VarChar, 11);
+
+            Console.WriteLine("ALTERAR TELEFONE\n\n");
+
+            Console.Write("Informe o Novo Telefone a ser inserido: ");
+            string telefone = Console.ReadLine();
+
+            SQLtelefone.Value = telefone;
+            SQLcpf.Value = cpfEditar;
+
+            cmd.Parameters.Add(SQLtelefone);
+            cmd.Parameters.Add(SQLcpf);
+
+            cmd.Prepare();
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+                Console.Clear();
+                Console.WriteLine("\nTelefone Alterado com Sucesso!!!");
+                Pausa();
+                connection.Close();
+                EditarAdotante(cpfEditar, connection);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Desculpe, Houve um erro inesperado...\n\nDescrição do Erro: <<<( " + ex + " )>>>");
+                Pausa();
+                connection.Close();
+                EditarAdotante(cpfEditar, connection);
+            }
+        } // OK
+        static void EditarSexoAdotante(string cpfEditar, SqlConnection connection)
+        {
+            Console.Clear();
+            SqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "UPDATE Pessoa SET Sexo = @Sexo WHERE CPF = @CPF;";
+            cmd.Connection = connection;
+            connection.Open();
+
+            SqlParameter SQLsexo = new SqlParameter("@Sexo", System.Data.SqlDbType.Char, 1);
+            SqlParameter SQLcpf = new SqlParameter("@CPF", System.Data.SqlDbType.VarChar, 11);
+
+            Console.WriteLine("ALTERAR SEXO\n\n");
+
+            Console.Write("Informe o Novo Sexo a ser inserido: ");
+            bool flag = false;
+            string sexo;
+            do
+            {
+                Console.Write("\nDigite [- F -] para Feminino, [- M -] para Masculino ou [- N -] caso Não queira informar");
+                Console.Write("\nSexo: ");
+                sexo = Console.ReadLine().ToUpper();
+                if (sexo.ToUpper() == "F" || sexo.ToUpper() == "M" || sexo.ToUpper() == "N")
+                {
+                    flag = true;
+                    break;
+                }
+            } while (flag == false);
+
+            SQLsexo.Value = sexo;
+            SQLcpf.Value = cpfEditar;
+
+            cmd.Parameters.Add(SQLsexo);
+            cmd.Parameters.Add(SQLcpf);
+
+            cmd.Prepare();
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+                Console.Clear();
+                Console.WriteLine("\nSexo Alterado com Sucesso!!!");
+                Pausa();
+                connection.Close();
+                EditarAdotante(cpfEditar, connection);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Desculpe, Houve um erro inesperado...\n\nDescrição do Erro: <<<( " + ex + " )>>>");
+                Pausa();
+                connection.Close();
+                EditarAdotante(cpfEditar, connection);
+            }
+        } // OK
+        static void EditarEnderecoAdotante(string cpfEditar, SqlConnection connection)
+        {
+            Console.Clear();
+            SqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "UPDATE Pessoa SET Cidade = @Cidade, Estado = @Estado, Bairro = @Bairro, Rua = @Rua, " +
+                              "Numero = @Numero, Complemento = @Complemento WHERE CPF = @CPF;";
+            cmd.Connection = connection;
+            connection.Open();
+
+            SqlParameter SQLcidade = new SqlParameter("@Cidade", System.Data.SqlDbType.VarChar, 50);
+            SqlParameter SQLestado = new SqlParameter("@Estado", System.Data.SqlDbType.VarChar, 30);
+            SqlParameter SQLbairro = new SqlParameter("@Bairro", System.Data.SqlDbType.VarChar, 50);
+            SqlParameter SQLrua = new SqlParameter("@Rua", System.Data.SqlDbType.VarChar, 50);
+            SqlParameter SQLnumero = new SqlParameter("@Numero", System.Data.SqlDbType.Int);
+            SqlParameter SQLcomplemento = new SqlParameter("@Complemento", System.Data.SqlDbType.VarChar, 50);
+            SqlParameter SQLcpf = new SqlParameter("@CPF", System.Data.SqlDbType.VarChar, 11);
+
+            string cidade, estado, bairro, rua, complemento;
+            int numero;
+
+            Console.WriteLine("ALTERAR ENDEREÇO\n\n");
+
+            Console.Write("Informe o Novo Endereço a ser inserido: ");
+            Console.Write("\nCidade: ");
+            cidade = Console.ReadLine();
+
+            Console.Write("\nEstado (U-F): ");
+            estado = Console.ReadLine();
+
+            Console.Write("\nBairro: ");
+            bairro = Console.ReadLine();
+
+            Console.Write("\nRua: ");
+            rua = Console.ReadLine();
+
+            Console.Write("\nNúmero: ");
+            numero = LerNumero();
+
+            Console.Write("\nComplemento: ");
+            complemento = Console.ReadLine();
+
+            SQLcidade.Value = cidade;
+            SQLestado.Value = estado;
+            SQLbairro.Value = bairro;
+            SQLrua.Value = rua;
+            SQLnumero.Value = numero;
+            SQLcomplemento.Value = complemento;
+            SQLcpf.Value = cpfEditar;
+
+            cmd.Parameters.Add(SQLcidade);
+            cmd.Parameters.Add(SQLestado);
+            cmd.Parameters.Add(SQLbairro);
+            cmd.Parameters.Add(SQLrua);
+            cmd.Parameters.Add(SQLnumero);
+            cmd.Parameters.Add(SQLcomplemento);
+            cmd.Parameters.Add(SQLcpf);
+
+            cmd.Prepare();
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+                Console.Clear();
+                Console.WriteLine("\nEndereço Alterado com Sucesso!!!");
+                Pausa();
+                connection.Close();
+                EditarAdotante(cpfEditar, connection);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Desculpe, Houve um erro inesperado...\n\nDescrição do Erro: <<<( " + ex + " )>>>");
+                Pausa();
+                connection.Close();
+                EditarAdotante(cpfEditar, connection);
+            }
+        } // OK
+        static void EditarDataNascimentoAdotante(string cpfEditar, SqlConnection connection)
+        {
+            Console.Clear();
+            SqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "UPDATE Pessoa SET Data_Nascimento = @Data_Nasc WHERE CPF = @CPF;";
+            cmd.Connection = connection;
+            connection.Open();
+
+            SqlParameter SQLdataNasc = new SqlParameter("@Data_Nasc", System.Data.SqlDbType.Date);
+            SqlParameter SQLcpf = new SqlParameter("@CPF", System.Data.SqlDbType.VarChar, 11);
+
+            Console.WriteLine("ALTERAR DATA DE NASCIMENTO\n\n");
+
+            Console.Write("Informe a nova Data de Nascimento a ser inserida: ");
+            DateTime dataNasc = LerData();
+
+            SQLdataNasc.Value = dataNasc;
+            SQLcpf.Value = cpfEditar;
+
+            cmd.Parameters.Add(SQLdataNasc);
+            cmd.Parameters.Add(SQLcpf);
+
+            cmd.Prepare();
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+                Console.Clear();
+                Console.WriteLine("\nData de Nascimento Alterada com Sucesso!!!");
+                Pausa();
+                connection.Close();
+                EditarAdotante(cpfEditar, connection);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Desculpe, Houve um erro inesperado...\n\nDescrição do Erro: <<<( " + ex + " )>>>");
+                Pausa();
+                connection.Close();
+                EditarAdotante(cpfEditar, connection);
+            }
+        } // OK
+        #endregion
+
         #endregion
 
         #region FUNCTIONS - PETS
@@ -500,7 +819,7 @@ namespace Proj_ONG_ResGatinhos
                 while (reader.Read())
                 {
                     Console.WriteLine("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________");
-                    Console.Write("{0}", /*chip*/reader.GetInt32(0) +  "    |    " +
+                    Console.Write("{0}", /*chip*/reader.GetInt32(0) + "    |    " +
                                       /*familia*/reader.GetString(1) + "    |    " +
                                          /*raca*/reader.GetString(2) + "    |    " +
                                          /*nome*/reader.GetString(3) + "    |    " +
@@ -532,7 +851,7 @@ namespace Proj_ONG_ResGatinhos
                 while (reader.Read())
                 {
                     Console.WriteLine("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________");
-                    Console.Write("{0}", /*chip*/reader.GetInt32(0)  + "    |    " +
+                    Console.Write("{0}", /*chip*/reader.GetInt32(0) + "    |    " +
                                       /*familia*/reader.GetString(1) + "    |    " +
                                          /*raca*/reader.GetString(2) + "    |    " +
                                          /*nome*/reader.GetString(3) + "    |    " +
@@ -608,7 +927,7 @@ namespace Proj_ONG_ResGatinhos
 
             SqlParameter SQLchip = new SqlParameter("@CHIP", System.Data.SqlDbType.Int);
 
-            SQLchip.Value= chip;
+            SQLchip.Value = chip;
 
             cmd.Parameters.Add(SQLchip);
 
@@ -677,21 +996,21 @@ namespace Proj_ONG_ResGatinhos
         {
             SqlCommand cmd = new SqlCommand();
 
-                cmd.CommandText = "SELECT Pessoa.CPF, Pessoa.Nome, Animal.Familia, Animal.Nome, Animal.Raca, Animal.Situacao " +
-                  "FROM Adota " +
+            cmd.CommandText = "SELECT Pessoa.CPF, Pessoa.Nome, Animal.Familia, Animal.Nome, Animal.Raca, Animal.Situacao " +
+              "FROM Adota " +
 
-                  "RIGHT JOIN Pessoa " +
+              "RIGHT JOIN Pessoa " +
 
-                  "ON(Pessoa.CPF = Adota.CPF) " +
+              "ON(Pessoa.CPF = Adota.CPF) " +
 
-                  "RIGHT JOIN Animal " +
+              "RIGHT JOIN Animal " +
 
-                  "ON(Animal.CHIP = Adota.CHIP) " +
+              "ON(Animal.CHIP = Adota.CHIP) " +
 
-                  "WHERE Animal.Situacao = 'ADOTADO';";
+              "WHERE Animal.Situacao = 'ADOTADO';";
 
-                cmd.Connection = connection;
-                connection.Open();
+            cmd.Connection = connection;
+            connection.Open();
 
             cmd.Prepare();
 
@@ -727,7 +1046,7 @@ namespace Proj_ONG_ResGatinhos
                 Pausa();
                 connection.Close();
                 Tela_Adocao(connection);
-            }                        
+            }
         }
         #endregion
 
