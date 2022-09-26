@@ -165,9 +165,51 @@ namespace Proj_ONG_ResGatinhos
         }
         public static void Tela_Adocao(SqlConnection connection) // OnProgress...
         {
+            connection.Open();
+            do
+            {
+                int opc;
+                Console.Clear();
+                Console.WriteLine("ADOÇÕES\n");
+                Console.WriteLine(" O que deseja fazer?");
+                Console.WriteLine(" 1 - Realizar uma nova Adoção");
+                Console.WriteLine(" 2 - Dezfazer uma Adoção");
+                Console.WriteLine(" 3 - Ver a Lista de Adotantes e seus respectivos Pets");
+                Console.WriteLine(" 0 - Voltar");
+                try
+                {
+                    opc = int.Parse(Console.ReadLine());
+                    switch (opc)
+                    {
+                        case 0:
+                            connection.Close(); // OK
+                            Tela_Inicial(connection);
+                            break;
 
+                        case 1:
+                            connection.Close();// OK
+                            CadastrarNovaAdocao(connection);
+                            break;
+
+                        case 2:
+                            connection.Close(); // OnProgress...
+                            DesfazerUmaAdocao(connection);
+                            break;
+
+                        case 3:
+                            connection.Close(); // OonProgress...
+                            MostrarAdotantesESeusPets(connection);
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            } while (true);
         }
         #endregion
+
         #region FUNCTIONS - ADOTANTES
         static void MostrarAdotantesCadastrados(SqlConnection connection) // OK
         {
@@ -275,7 +317,7 @@ namespace Proj_ONG_ResGatinhos
             rua = Console.ReadLine();
 
             Console.Write("\nNúmero: ");
-            numero = LerNumeroResidencial();
+            numero = LerNumero();
 
             Console.Write("\nComplemento: ");
             complemento = Console.ReadLine();
@@ -309,6 +351,9 @@ namespace Proj_ONG_ResGatinhos
 
             cmd.Prepare();
             cmd.ExecuteNonQuery();
+            Console.Clear();
+            Console.WriteLine("\nCadastro Realizado com Sucesso!!!");
+            Pausa();
             connection.Close();
         }
         static void MostrarAnimaisAdotadosPeloCPF(String cpf, SqlConnection connection) // OK
@@ -432,6 +477,9 @@ namespace Proj_ONG_ResGatinhos
 
             cmd.Prepare();
             cmd.ExecuteNonQuery();
+            Console.Clear();
+            Console.WriteLine("\nCadastro Realizado com Sucesso!!!");
+            Pausa();
             connection.Close();
         }
         static void MostrarPetsDisponiveis(SqlConnection connection) // OK
@@ -500,6 +548,189 @@ namespace Proj_ONG_ResGatinhos
         }
         #endregion
 
+        #region FUNCTIONS - ADOCAO
+        static void CadastrarNovaAdocao(SqlConnection connection) // OK
+        {
+            Console.Clear();
+            SqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "INSERT INTO Adota VALUES(@CPF, @CHIP);";
+            cmd.Connection = connection;
+            connection.Open();
+
+            SqlParameter SQLcpf = new SqlParameter("@CPF", System.Data.SqlDbType.VarChar, 11);
+            SqlParameter SQLchip = new SqlParameter("@CHIP", System.Data.SqlDbType.Int);
+
+            string cpf;
+            int chip;
+
+            Console.WriteLine("REGISTRO DE ADOÇÃO\n\n");
+
+            Console.Write("Informe o 'CPF' da pessoa que irá fazer uma adoção: ");
+            cpf = Console.ReadLine();
+
+            Console.Write("\nInforme o 'CHIP' de registro do Pet a ser Adotado: ");
+            chip = LerNumero();
+
+            SQLcpf.Value = cpf;
+            SQLchip.Value = chip;
+
+            cmd.Parameters.Add(SQLcpf);
+            cmd.Parameters.Add(SQLchip);
+
+            cmd.Prepare();
+            try
+            {
+                connection.Close();
+                FinalizarAdocao(connection, chip);
+                connection.Open();
+                cmd.ExecuteNonQuery();
+                Console.Clear();
+                Console.WriteLine("\nAdoção Realizada com Sucesso!!!");
+                Pausa();
+                connection.Close();
+            }
+            catch
+            {
+                Console.WriteLine("\n\nDesculpe, Não foi possível realizar essa Adoção. Tente novamente.\n" +
+                                  "Certifique-se de que o 'CPF' e o 'CHIP' informados sejam digitados corretamente.");
+                Pausa();
+                connection.Close();
+                Tela_Adocao(connection);
+            }
+        }
+        static void FinalizarAdocao(SqlConnection connection, int chip) // OK
+        {
+            Console.Clear();
+            SqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "UPDATE Animal SET Situacao = 'ADOTADO' WHERE CHIP = @CHIP;";
+            cmd.Connection = connection;
+            connection.Open();
+
+            SqlParameter SQLchip = new SqlParameter("@CHIP", System.Data.SqlDbType.Int);
+
+            SQLchip.Value= chip;
+
+            cmd.Parameters.Add(SQLchip);
+
+            cmd.Prepare();
+            cmd.ExecuteNonQuery();
+            connection.Close();
+        }
+        static void DesfazerUmaAdocao(SqlConnection connection) // OK
+        {
+            Console.Clear();
+            SqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "DELETE FROM Adota WHERE CHIP = @CHIP;";
+            cmd.Connection = connection;
+            connection.Open();
+
+            SqlParameter SQLchip = new SqlParameter("@CHIP", System.Data.SqlDbType.Int);
+
+            Console.WriteLine("DESFAZER UMA ADOÇÃO\n\n");
+
+            Console.Write("Informe o 'CHIP' do Pet que deseja desvincular uma Adoção: ");
+            int chip = LerNumero();
+            SQLchip.Value = chip;
+
+            cmd.Parameters.Add(SQLchip);
+
+            cmd.Prepare();
+
+            try
+            {
+                connection.Close();
+                FinalizarDesfazerAdocao(connection, chip);
+                connection.Open();
+                cmd.ExecuteNonQuery();
+                Console.Clear();
+                Console.WriteLine("\nDesvínculo de Adoção Realizado com Sucesso!!!");
+                Pausa();
+                connection.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Desculpe, Houve um erro inesperado...\n\nDescrição do Erro: <<<( " + ex + " )>>>");
+                Pausa();
+                connection.Close();
+                Tela_Adocao(connection);
+            }
+        }
+        static void FinalizarDesfazerAdocao(SqlConnection connection, int chip) // OK
+        {
+            Console.Clear();
+            SqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "UPDATE Animal SET Situacao = 'DISPONIVEL' WHERE CHIP = @CHIP;";
+            cmd.Connection = connection;
+            connection.Open();
+
+            SqlParameter SQLchip = new SqlParameter("@CHIP", System.Data.SqlDbType.Int);
+
+            SQLchip.Value = chip;
+
+            cmd.Parameters.Add(SQLchip);
+
+            cmd.Prepare();
+            cmd.ExecuteNonQuery();
+            connection.Close();
+        }
+        static void MostrarAdotantesESeusPets(SqlConnection connection) // OK
+        {
+            SqlCommand cmd = new SqlCommand();
+
+                cmd.CommandText = "SELECT Pessoa.CPF, Pessoa.Nome, Animal.Familia, Animal.Nome, Animal.Raca, Animal.Situacao " +
+                  "FROM Adota " +
+
+                  "RIGHT JOIN Pessoa " +
+
+                  "ON(Pessoa.CPF = Adota.CPF) " +
+
+                  "RIGHT JOIN Animal " +
+
+                  "ON(Animal.CHIP = Adota.CHIP) " +
+
+                  "WHERE Animal.Situacao = 'ADOTADO';";
+
+                cmd.Connection = connection;
+                connection.Open();
+
+            cmd.Prepare();
+
+            try
+            {
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    Console.Clear();
+                    Console.WriteLine("\nLista de Adotantes e seus Respectivos Pets Adotados:");
+                    Console.WriteLine("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________");
+                    Console.WriteLine("|  CPF  |   Nome   |   Animal   |    Nome do Pet   |   Raça  |   Status     |");
+                    Console.WriteLine("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________\n\n");
+                    while (reader.Read())
+                    {
+                        Console.WriteLine("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________");
+                        Console.Write("{0}",  /*cpf*/reader.GetString(0) + "    |    " +
+                                             /*nome*/reader.GetString(1) + "    |    " +
+                                           /*animal*/reader.GetString(2) + "    |    " +
+                                      /*nome do pet*/reader.GetString(3) + "    |    " +
+                                             /*raça*/reader.GetString(4) + "    |    " +
+                                           /*Status*/reader.GetString(5) + "    |    \n");
+                        Console.Write("________________________________________________________________________________________________________________________________________________________________________________________________________________________________________\n\n");
+                    }
+                    Console.WriteLine("Fim da Lista");
+                    Pausa();
+                    connection.Close();
+                    Tela_Adocao(connection);
+                }
+            }
+            catch
+            {
+                Console.WriteLine("\nA Lista está vazia!");
+                Pausa();
+                connection.Close();
+                Tela_Adocao(connection);
+            }                        
+        }
+        #endregion
+
         #region FUNCTIONS - GERAL
         static void Pausa() // OK
         {
@@ -522,7 +753,7 @@ namespace Proj_ONG_ResGatinhos
                 }
             } while (true);
         }
-        static int LerNumeroResidencial() // OK
+        static int LerNumero() // OK
         {
             do
             {
